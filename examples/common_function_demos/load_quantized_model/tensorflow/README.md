@@ -34,11 +34,13 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[2]: 0.9897317290306091
-[408]: 0.0009118635789491236
-[795]: 0.0006728958687745035
-[974]: 0.00015886672190390527
-[352]: 0.00014724396169185638
+model: inception_v3_quant
+-----TOP 5-----
+[002]: score=0.989732 class="goldfish, Carassius auratus"
+[408]: score=0.000912 class="ambulance"
+[795]: score=0.000673 class="shower curtain"
+[974]: score=0.000159 class="coral reef"
+[352]: score=0.000147 class="hartebeest"
 ```
 
 1. The label index with the highest score is 2, the corresponding label is `goldfish, Carassius auratus`.

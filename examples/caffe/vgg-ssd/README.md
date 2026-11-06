@@ -2,10 +2,9 @@
 
 
 ## Model Source
-The model used in this example come from the following open source projects:
-https://github.com/weiliu89/caffe/tree/ssd
-The download link provided by this project has expired, please download the model weight from the following network disk link(fetch code is `rknn`):
-https://eyun.baidu.com/s/3jJhPRzo
+The model used in this example come from the following open source projects:  
+https://github.com/weiliu89/caffe/tree/ssd#models  
+But the model download link has expired, please download from [VGG_VOC0712_SSD_300x300_iter_120000.caffemodel](https://ftzr.zbox.filez.com/v2/delivery/data/95f00b0fc900458ba134f8b180b3f7a1/asset/vgg-ssd/VGG_VOC0712_SSD_300x300_iter_120000.caffemodel).
 
 
 ## Usage for the script
@@ -34,7 +33,7 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 ## Expected results
 
-The test result should be similar to picutre `ref_detect_results.jpg`.
+The test result should be similar to picture `ref_detect_results.jpg`.
 
 *Note: Different platforms, different versions of tools and drivers may have slightly different results.*
 

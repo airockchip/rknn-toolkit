@@ -1,26 +1,8 @@
 import cv2
 import numpy as np
 import onnxruntime as rt
+from utils import do_softmax, show_top5
 
-def softmax(x):
-    return np.exp(x)/sum(np.exp(x))
-
-def show_outputs(outputs):
-    output = outputs
-    output_sorted = sorted(output, reverse=True)
-    top5_str = 'shufflnetv2_x1\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
-    print(top5_str)
 
 def run_onnx_part(inputs, model_path):
     sess = rt.InferenceSession(model_path)
@@ -47,5 +29,6 @@ if __name__ == '__main__':
     img /= 57.38
 
     result = run_onnx_part([img], model_path)
-    show_outputs(softmax(result[0]))
+    outputs = do_softmax(result)
+    show_top5(outputs)
     print('done')

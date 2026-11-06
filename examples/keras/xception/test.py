@@ -11,6 +11,7 @@ from rknn.api import RKNN
 
 KERAS_MODEL_PATH = './xception.h5'
 IMG_PATH = 'goldfish_299x299.jpg'
+CLASS_LABEL_PATH='./synset.txt'
 
 
 def export_keras_model():
@@ -29,21 +30,21 @@ def export_keras_model():
         model.save(KERAS_MODEL_PATH)
 
 
-def show_outputs(outputs):
+def show_top5(outputs):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
+
     output = outputs[0].reshape(-1)
-    output_sorted = sorted(output, reverse=True)
-    top5_str = 'xception\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: xception\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
     print(top5_str)
 
 
@@ -131,7 +132,7 @@ if __name__ == '__main__':
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
     # Get TOP5 labels` index and corresponding scores
-    show_outputs(outputs)
+    show_top5(outputs)
     print('done')
 
     rknn.release()

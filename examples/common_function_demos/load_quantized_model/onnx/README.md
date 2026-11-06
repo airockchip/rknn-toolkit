@@ -45,24 +45,24 @@ python test.py rv1126 c3d9b8674f4b94f6
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
 --> Running rknn model
-shufflenet
+model: shufflenet-v2_quant
 -----TOP 5-----
-[155]: 0.9880157113075256
-[154]: 0.010230629704892635
-[364]: 0.00030893823713995516
-[960]: 0.00017329865659121424
-[879]: 0.00013287267938721925
+[155]: score=0.988016 class="n02086240 Shih-Tzu"
+[154]: score=0.010231 class="n02086079 Pekinese, Pekingese, Peke"
+[364]: score=0.000309 class="n02457408 three-toed sloth, ai, Bradypus tridactylus"
+[960]: score=0.000173 class="n07836838 chocolate sauce, chocolate syrup"
+[879]: score=0.000133 class="n04507155 umbrella"
 
 --> Running onnx model
-shufflenet
+model: shufflenet-v2_quant
 -----TOP 5-----
-[155]: 0.9878916144371033
-[154]: 0.009037788026034832
-[960]: 0.0005273366696201265
-[879]: 0.0002684167993720621
-[364]: 0.00025560680660419166
+[155]: score=0.987892 class="n02086240 Shih-Tzu"
+[154]: score=0.009038 class="n02086079 Pekinese, Pekingese, Peke"
+[960]: score=0.000527 class="n07836838 chocolate sauce, chocolate syrup"
+[879]: score=0.000268 class="n04507155 umbrella"
+[364]: score=0.000256 class="n02457408 three-toed sloth, ai, Bradypus tridactylus"
 ```
 
-1. The label index with the highest score is 155, the corresponding label is `Pekinese, Pekingese, Peke`.
+1. The label index with the highest score is 155, the corresponding label is `Shih-Tzu`.
 2. The download link for labels file: https://s3.amazonaws.com/onnx-model-zoo/synset.txt
 3. Different platforms, different versions of tools and drivers may have slightly different results.

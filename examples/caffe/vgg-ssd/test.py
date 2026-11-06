@@ -146,7 +146,7 @@ def ssd_post_process(conf_data, loc_data):
         draw.text((x1+margin, text_bottom-text_height-margin), display_str, fill='black', font=font)
 
     np.copyto(img, np.array(img_pil))
-    cv2.imwrite("results.jpg", img)
+    cv2.imwrite("result.jpg", img)
     print("The detection results have been saved to results.jpg")
 
 
@@ -174,7 +174,7 @@ if __name__ == '__main__':
 
     if not os.path.exists('./VGG_VOC0712_SSD_300x300_iter_120000.caffemodel'):
        print('!!! Missing VGG_VOC0712_SSD_300x300_iter_120000.caffemodel !!!\n' \
-             '1. Please download caffemodel from https://eyun.baidu.com/s/3jJhPRzo , fetch code is: rknn\n')
+             '1. Please download caffemodel from https://ftzr.zbox.filez.com/v2/delivery/data/95f00b0fc900458ba134f8b180b3f7a1/asset/vgg-ssd/VGG_VOC0712_SSD_300x300_iter_120000.caffemodel \n')
        exit(-1) 
 
     # Create RKNN object

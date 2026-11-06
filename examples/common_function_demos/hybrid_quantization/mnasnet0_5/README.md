@@ -7,8 +7,16 @@ https://github.com/pytorch/vision/tree/main/torchvision/models
 
 
 ## Usage for the script
+***1. Users can perform default hybrid quantization. The usage is as follows:***
+```sh
+python auto_hybrid_quantization.py [target] [device_id]
+```
+*Parameter Description:*
+- target: target platform. Optional parameter, the default value is `rv1126`, you can fill in `rk1806`, `rk1808`, `rk3399pro`, `rv1109`, `rv1126`.
+- device_id: Device ID, when multiple devices are connected, this parameter is used to distinguish them. Optional parameter, default value is None.
 
-*Usage:*
+
+***2. Users can also modify the quantization configuration and perform hybrid quantization step by step. The usage is as follows:***
 ```
 # The step1 of hybrid quantization: get model structure, weight and quantization configure files
 python step1.py [target]
@@ -58,11 +66,11 @@ If no layer changed, please set {} as empty directory for customized_quantize_la
 
 This step3.py will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[812]: 0.7788181304931641
-[484]: 0.029811235144734383
-[404]: 0.01403999887406826
-[833]: 0.011485863476991653
-[403]: 0.010388719849288464
+[812]: score=0.778818 class="n04266014 space shuttle"
+[484]: score=0.029811 class="n02981792 catamaran"
+[404]: score=0.014040 class="n02690373 airliner"
+[833]: score=0.011486 class="n04347754 submarine, pigboat, sub, U-boat"
+[403]: score=0.010389 class="n02687172 aircraft carrier, carrier, flattop, attack aircraft carrier"
 ```
 
 1. The label index with the highest score is 812, the corresponding label is `space shuttle`.

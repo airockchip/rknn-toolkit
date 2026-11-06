@@ -34,7 +34,7 @@ if __name__ == '__main__':
     print('--> Loading model')
     ret = rknn.load_tensorflow(tf_pb='./ssd_mobilenet_v2.pb',
                                inputs=['FeatureExtractor/MobilenetV2/MobilenetV2/input'],
-                               outputs=['concat_1', 'concat'],
+                               outputs=['concat', 'concat_1'],
                                input_size_list=[[300, 300, 3]],
                                predef_file=None)
     if ret != 0:

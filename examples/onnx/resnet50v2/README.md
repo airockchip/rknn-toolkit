@@ -34,13 +34,15 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[155]: 0.6183234453201294
-[154]: 0.3416009843349457
-[262]: 0.021962042897939682
-[152]: 0.003988372161984444
-[204]: 0.002964471932500601
+model: resnet50v2
+-----TOP 5-----
+[812]: score=1.000000 class="n04266014 space shuttle"
+[657]: score=0.000000 class="n03773504 missile"
+[744]: score=0.000000 class="n04008634 projectile, missile"
+[404]: score=0.000000 class="n02690373 airliner"
+[833]: score=0.000000 class="n04347754 submarine, pigboat, sub, U-boat"
 ```
 
-1. The label index with the highest score is 155, the corresponding label is `Pekinese, Pekingese, Peke`.
+1. The label index with the highest score is 812, the corresponding label is `n04266014 space shuttle`.
 2. The download link for labels file: https://s3.amazonaws.com/onnx-model-zoo/synset.txt
 3. Different platforms, different versions of tools and drivers may have slightly different results.

@@ -9,38 +9,26 @@ from rknn.api import RKNN
 ONNX_MODEL = 'shufflenet-v2_quant.onnx'
 IMG_PATH = './test_images/dog_224x224.jpg'
 RKNN_MODEL = './shufflenet-v2_quant.rknn'
+CLASS_LABEL_PATH = './synset.txt'
 
 
-def show_outputs(outputs):
-    output = outputs[0][0]
-    output_sorted = sorted(output, reverse=True)
-    top5_str = 'shufflenet\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
-    print(top5_str)
+def show_top5(outputs):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
 
-
-def readable_speed(speed):
-    speed_bytes = float(speed)
-    speed_kbytes = speed_bytes / 1024
-    if speed_kbytes > 1024:
-        speed_mbytes = speed_kbytes / 1024
-        if speed_mbytes > 1024:
-            speed_gbytes = speed_mbytes / 1024
-            return "{:.2f} GB/s".format(speed_gbytes)
+    output = outputs[0].reshape(-1)
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: shufflenet-v2_quant\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(
+                index, value, labels[index])
         else:
-            return "{:.2f} MB/s".format(speed_mbytes)
-    else:
-        return "{:.2f} KB/s".format(speed_kbytes)
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
+    print(top5_str)
 
 
 if __name__ == '__main__':
@@ -116,6 +104,8 @@ if __name__ == '__main__':
     # Set inputs
     img = cv2.imread(IMG_PATH)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # HWC -> NHWC
+    img = np.expand_dims(img, 0)
 
     # init runtime environment
     print('--> Init runtime environment')
@@ -135,11 +125,11 @@ if __name__ == '__main__':
     # Inference
     print('--> Running rknn model')
     outputs = rknn.inference(inputs=[img])
+    # do softmax
     x = outputs[-1]
-
     output = np.exp(x)/np.sum(np.exp(x))
     outputs = [output]
-    show_outputs(outputs)
+    show_top5(outputs)
 
     print('--> Running onnx model')
     import onnxruntime as rt
@@ -148,19 +138,25 @@ if __name__ == '__main__':
     input_name = sess.get_inputs()[0].name
     output_name= sess.get_outputs()[0].name
     output_shape = sess.get_outputs()[0].shape
+
+    # get input data
     img = img.astype(np.float32)
+    # pre-process
     mean_values=[123.675, 116.28, 103.53]
     std_values=[58.82, 58.82, 58.82]
-    img[:,:,0] = (img[:,:,0] - mean_values[0])/std_values[0]
-    img[:,:,1] = (img[:,:,1] - mean_values[1])/std_values[1]
-    img[:,:,2] = (img[:,:,2] - mean_values[2])/std_values[2]
-    img = img.reshape(1,*img.shape)
+    img[:,:,:,0] = (img[:,:,:,0] - mean_values[0])/std_values[0]
+    img[:,:,:,1] = (img[:,:,:,1] - mean_values[1])/std_values[1]
+    img[:,:,:,2] = (img[:,:,:,2] - mean_values[2])/std_values[2]
+    # # HWC -> NHWC
+    # img = img.reshape(1,*img.shape)
+    # NHWC -> NCHW
     img = img.transpose(0,3,1,2)
-    #forward model
+    # forward model
     res = sess.run([output_name], {input_name: img})
     outputs = np.array(res)
+    # do softmax
     x = outputs[0]
     output = np.exp(x)/np.sum(np.exp(x))
     outputs = [output]
-    show_outputs(outputs)
+    show_top5(outputs)
     print('done')

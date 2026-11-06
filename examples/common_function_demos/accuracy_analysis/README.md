@@ -69,33 +69,33 @@ This example uses the shufflenetv2.onnx model as a demonstration to show the usa
 
    ```
    -----TOP 5-----
-   [155]: 0.9758387804031372
-   [154]: 0.02226063795387745
-   [364]: 0.00038293670513667166
-   [960]: 0.00022784945031162351
-   [879]: 0.0001287872582906857
+   [155]: score=0.975839 class="n02086240 Shih-Tzu"
+   [154]: score=0.022261 class="n02086079 Pekinese, Pekingese, Peke"
+   [364]: score=0.000383 class="n02457408 three-toed sloth, ai, Bradypus tridactylus"
+   [960]: score=0.000228 class="n07836838 chocolate sauce, chocolate syrup"
+   [879]: score=0.000129 class="n04507155 umbrella"
    ```
 
    `python run_normal_quantization_model.py`
 
    ```
    -----TOP 5-----
-   [155]: 0.9094294309616089
-   [154]: 0.06887859851121902
-   [364]: 0.0020060015376657248
-   [193]: 0.0018231587018817663
-   [879]: 0.0012439332203939557
+   [155]: score=0.909429 class="n02086240 Shih-Tzu"
+   [154]: score=0.068879 class="n02086079 Pekinese, Pekingese, Peke"
+   [364]: score=0.002006 class="n02457408 three-toed sloth, ai, Bradypus tridactylus"
+   [193]: score=0.001823 class="n02096294 Australian terrier"
+   [879]: score=0.001244 class="n04507155 umbrella"
    ```
 
    `python run_hybrid_quantization_model.py`
 
    ```
    -----TOP 5-----
-   [155]: 0.9504370093345642
-   [154]: 0.04463796317577362
-   [194 364]: 0.0005500342231243849
-   [194 364]: 0.0005500342231243849
-   [879]: 0.00041292302194051445
+   [155]: score=0.950437 class="n02086240 Shih-Tzu"
+   [154]: score=0.044638 class="n02086079 Pekinese, Pekingese, Peke"
+   [194]: score=0.000550 class="n02096437 Dandie Dinmont, Dandie Dinmont terrier"
+   [364]: score=0.000550 class="n02457408 three-toed sloth, ai, Bradypus tridactylus"
+   [879]: score=0.000413 class="n04507155 umbrella"
    ```
 
    - It can be seen that the classification score of the hybrid quantization model has been greatly improved, and is closer to the classification score of the original model. Here users can also try to use the default recommended configuration for hybrid quantization.

@@ -1,1 +1,4 @@
-dog_224x224.jpg
+Shih-Tzu_224.jpg
+space_shuttle_224.jpg
+monkey.jpg
+bee_eater.jpg

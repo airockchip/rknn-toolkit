@@ -4,22 +4,23 @@ import numpy as np
 import cv2
 from rknn.api import RKNN
 
+CLASS_LABEL_PATH='./synset_words.txt'
 
 def show_outputs(outputs):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
+
     output = outputs[0].reshape(-1)
-    output_sorted = sorted(output, reverse=True)
-    top5_str = 'mobilenet_v2\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: mobilenet_v2\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
     print(top5_str)
 
 

@@ -10,7 +10,7 @@
 
 *Usage:*
 ```
-python test.py [target] [device_id]
+python gen_conv_and_convert_with_pruning.py [target] [device_id]
 ```
 *Parameter Description:*
 - target: target platform. Optional parameter, the default value is `rv1126`, you can fill in `rk1806`, `rk1808`, `rk3399pro`, `rv1109`, `rv1126`.
@@ -18,15 +18,15 @@ python test.py [target] [device_id]
 
 If the target device is `RV1109` or `RV1126`, you can directly execute the following command to run the example:
 ```
-python test.py
+python gen_conv_and_convert_with_pruning.py
 ```
 If the target device is RK1806, RK1808 or RK3399Pro, you can execute the following command to run the example:
 ```
-python test.py rk1808
+python gen_conv_and_convert_with_pruning.py rk1808
 ```
 If you connect multiple devices, you need to specify the device ID, please refer to the following command to run the example::
 ```
-python test.py rv1126 c3d9b8674f4b94f6
+python gen_conv_and_convert_with_pruning.py rv1126 c3d9b8674f4b94f6
 ```
 
 

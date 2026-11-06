@@ -4,24 +4,27 @@ import numpy as np
 import cv2
 from rknn.api import RKNN
 
+RKNN_BATCH_SIZE = 4
+CLASS_LABEL_PATH = './labels.txt'
 
-def show_outputs(outputs):
-    output_ = outputs[0].reshape((-1, 1001))
-    for idx, output in enumerate(output_):
-        output_sorted = sorted(output, reverse=True)
-        top5_str = 'mobilenet_v1 input[{}]\n-----TOP 5-----\n'.format(idx)
-        for i in range(5):
-            value = output_sorted[i]
-            index = np.where(output == value)
-            for j in range(len(index)):
-                if (i + j) >= 5:
-                    break
-                if value > 0:
-                    topi = '{}: {}\n'.format(index[j], value)
-                else:
-                    topi = '-1: 0.0\n'
-                top5_str += topi
-        print(top5_str)
+
+def show_top5(outputs, input_path):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
+
+    output = outputs[0].reshape(-1)
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'TOP 5 for input: {}\n'.format(input_path)
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(
+                index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
+    print(top5_str)
 
 
 if __name__ == '__main__':
@@ -68,7 +71,7 @@ if __name__ == '__main__':
 
     # Build model
     print('--> Building model')
-    ret = rknn.build(do_quantization=True, dataset='./dataset.txt', rknn_batch_size=4)
+    ret = rknn.build(do_quantization=True, dataset='./dataset.txt', rknn_batch_size=RKNN_BATCH_SIZE)
     if ret != 0:
         print('Build mobilenet_v1 failed!')
         exit(ret)
@@ -83,10 +86,20 @@ if __name__ == '__main__':
     print('done')
 
     # Set inputs
-    img = cv2.imread('./dog_224x224.jpg')
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    img = np.concatenate((img, img, img, img), axis=0)
+    # get input paths from dataset.txt
+    with open('dataset.txt', 'r') as f:
+        paths = f.readlines()
+    img_list = []
+    assert len(paths) == RKNN_BATCH_SIZE
+    for i in range(RKNN_BATCH_SIZE):
+        img = cv2.imread(paths[i].strip())
+        img = cv2.resize(img, (224, 224))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = np.expand_dims(img, 0)
+        img_list.append(img)
+
+    imgs = np.concatenate(tuple(img_list), axis=0)
 
     # init runtime environment
     print('--> Init runtime environment')
@@ -102,8 +115,12 @@ if __name__ == '__main__':
 
     # Inference
     print('--> Running model')
-    outputs = rknn.inference(inputs=[img])
-    show_outputs(outputs)
+    outputs = rknn.inference(inputs=[imgs])
+    # outputs[0] shape: 4, 1001
+    outputs = outputs[0].reshape((-1, 1001))
+    print('model: mobilenet_v1')
+    for idx, out in enumerate(outputs):
+        show_top5([out], paths[idx].strip())
     print('done')
 
     rknn.release()

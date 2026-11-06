@@ -332,7 +332,7 @@ if __name__ == '__main__':
     if boxes is not None:
         draw(image, boxes, scores, classes)
 
-    cv2.imwrite("results.jpg", image)
+    cv2.imwrite("result.jpg", image)
     print("The detection results have been drawn into results.jpg")
 
     rknn.release()

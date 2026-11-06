@@ -34,14 +34,16 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[1]: 0.9990234375
-[0]: 0.0001596212387084961
--1: 0.0
--1: 0.0
--1: 0.0
+model: xception
+-----TOP 5-----
+[001]: score=0.999023 class="n01443537 goldfish, Carassius auratus"
+[000]: score=0.000184 class="n01440764 tench, Tinca tinca"
+[ -1]: score=0.0
+[ -1]: score=0.0
+[ -1]: score=0.0
 ```
 
-1. The label index with the highest score is 1, the corresponding label is `goldfish, Carassius auratus`.
+1. The label index with the highest score is 1, the corresponding label is `n01443537 goldfish, Carassius auratus`.
 2. The download link for labels file: https://s3.amazonaws.com/onnx-model-zoo/synset.txt
 3. Different platforms, different versions of tools and drivers may have slightly different results.
 4. If the label index is -1, it means that the scores of other categories are all 0.

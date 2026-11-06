@@ -7,6 +7,7 @@ from rknn.api import RKNN
 import gluoncv
 import mxnet as mx
 
+CLASS_LABEL_PATH='./synset.txt'
 
 def export_mxnet_model():
 
@@ -22,15 +23,21 @@ def export_mxnet_model():
 
 
 def show_top5(outputs):
-    output = softmax(outputs[0][0])
-    reverse_sort_index = np.argsort(output)[::-1]
-    print('-----TOP 5-----')
-    for i in range(5):
-        print(reverse_sort_index[i], ':', output[reverse_sort_index[i]])
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
 
-
-def softmax(x):
-    return np.exp(x)/sum(np.exp(x))
+    output = outputs[0].reshape(-1)
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: resnext50\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
+    print(top5_str)
 
 
 if __name__ == '__main__':
@@ -119,6 +126,10 @@ if __name__ == '__main__':
     # Inference
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
+    # Softmax
+    x = outputs[0]
+    output = np.exp(x)/np.sum(np.exp(x))
+    outputs = [output]
     # Show the top5 predictions
     show_top5(outputs)
     print('done')

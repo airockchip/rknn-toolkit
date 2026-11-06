@@ -1,0 +1,40 @@
+# If install failed:
+#   1. Try upgrading pip: pip install --upgrade pip -i https://pypi.org/simple
+#   2. Change the pip source to 'https://pypi.tuna.tsinghua.edu.cn/simple/'
+
+
+# base deps
+numpy==1.19.5
+protobuf==3.13.0
+flatbuffers==1.10
+
+# utils
+requests==2.22.0
+psutil==6.1.0
+ruamel.yaml==0.15.81
+scipy==1.4.1
+tqdm==4.63.0
+opencv-python==4.5.1.48
+matplotlib==3.3.4
+
+# base
+onnx==1.10.0
+onnxoptimizer==0.2.7
+onnxruntime==1.9.0
+torch == 1.10.0
+torchvision==0.11.1
+tensorflow==2.2.0
+
+#
+Pillow==8.4.0
+h5py==2.10.0
+lmdb==1.4.1
+networkx==1.11
+ply==3.11
+mxnet==1.5.0
+sklearn==0.0
+Jinja2==3.0.0
+flask==2.0.2
+# bfloat16==1.1
+gluoncv==0.10.5
+pandas==1.1.5

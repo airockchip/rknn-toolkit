@@ -3,27 +3,7 @@ import sys
 import numpy as np
 import cv2
 from rknn.api import RKNN
-
-
-def show_outputs(output):
-    output_sorted = sorted(output, reverse=True)
-    top5_str = '\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
-    print(top5_str)
-
-
-def softmax(x):
-    return np.exp(x)/sum(np.exp(x))
+from utils import do_softmax, show_top5
 
 
 if __name__ == '__main__':
@@ -78,7 +58,8 @@ if __name__ == '__main__':
     # Inference
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
-    show_outputs(softmax(np.array(outputs[0][0])))
+    outputs = do_softmax(outputs)
+    show_top5(outputs)
     print('done')
 
     rknn.release()

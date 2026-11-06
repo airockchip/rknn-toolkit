@@ -10,11 +10,11 @@ https://cnbj1.fds.api.xiaomi.com/mace/miai-models/deeplab-v3-plus/deeplab-v3-plu
 
 *Usage:*
 ```
-python test.py [pass-through] [use-rknn] [target] [device-id]
+python test.py --not-pass-through --use-rknn --target --device-id
 ```
 *Parameter Description:*
-- pass-through: whether to pass through input data. Optional parameter, the default value is `True`. If set to `1`, pass through input data, other value, pass-through will set to `False`.
-- use-rknn: whether to use RKNN model directly. Optional paramter, the default value is `False`. If set to `1`, the script will load RKNN model directly, If the RKNN model does not exist, the script will throw an error and exit.
+- --not-pass-through: whether to pass through input data. Optional parameter. If this parameter is not set, this script will pass through input data to NPU directly, otherwise, the rknn runtime will pre-process and quantized input data, then pass to NPU.
+- use-rknn: whether to use RKNN model directly. Optional paramter. If this parameter is set, the script will load RKNN model directly, please make sure the RKNN model exists.
 - target: target platform. Optional parameter, the default value is `rv1126`, you can fill in `rk1806`, `rk1808`, `rk3399pro`, `rv1109`, `rv1126`.
 - device_id: Device ID, when multiple devices are connected, this parameter is used to distinguish them. Optional parameter, default value is None.
 
@@ -22,15 +22,22 @@ If the target device is `RV1109` or `RV1126`, you can directly execute the follo
 ```
 python test.py
 ```
+If you do not want to pass through input data, you can execute the following command to run the example:
+```
+python test.py --not-pass-through
+```
+If you have already done model conversion and want to use the RKNN model directly for testing, you can execute the following command to run the example:
+```
+python test.py --use-rknn
+```
 If the target device is RK1806, RK1808 or RK3399Pro, you can execute the following command to run the example:
 ```
-python test.py 1 0 rk1808
+python test.py --target rk1808
 ```
 If you connect multiple devices, you need to specify the device ID, please refer to the following command to run the example:
 ```
-python test.py 1 0 rv1126 c3d9b8674f4b94f6
+python test.py --target rv1126 --device-id c3d9b8674f4b94f6
 ```
-
 
 ## Expected results
 

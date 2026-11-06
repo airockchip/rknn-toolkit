@@ -7,8 +7,16 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 
 
 ## Usage for the script
+***1. Users can perform default hybrid quantization. The usage is as follows:***
+```sh
+python auto_hybrid_quantization.py [target] [device_id]
+```
+*Parameter Description:*
+- target: target platform. Optional parameter, the default value is `rv1126`, you can fill in `rk1806`, `rk1808`, `rk3399pro`, `rv1109`, `rv1126`.
+- device_id: Device ID, when multiple devices are connected, this parameter is used to distinguish them. Optional parameter, default value is None.
 
-*Usage:*
+
+***2. Users can also modify the quantization configuration and perform hybrid quantization step by step. The usage is as follows:***
 ```
 # The step1 of hybrid quantization: get model structure, weight and quantization configure files
 python step1.py [target]
@@ -56,6 +64,6 @@ If no layer changed, please set {} as empty directory for customized_quantize_la
 
 ## Expected results
 
-The test result should be similar to picutre `ref_detect_result.jpg`.
+The test result should be similar to picutre `ref_detect_results.jpg`.
 
 - Different platforms, different versions of tools and drivers may have slightly different results.

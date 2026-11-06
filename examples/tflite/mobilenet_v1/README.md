@@ -34,13 +34,15 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[156]: 0.8515625
-[155]: 0.091796875
-[205]: 0.0135955810546875
-[284]: 0.0064697265625
-[194 260]: 0.002239227294921875
+model: mobilenet_v1
+-----TOP 5-----
+[813]: score=0.999023 class="space shuttle"
+[405]: score=0.000526 class="airliner"
+[868]: score=0.000136 class="trailer truck, tractor trailer, trucking rig, rig, articulated lorry, semi"
+[896]: score=0.000109 class="warplane, military plane"
+[ -1]: score=0.0
 ```
 
-1. The label index with the highest score is 156, the corresponding label is `Pekinese, Pekingese, Peke`.
+1. The label index with the highest score is 813, the corresponding label is `space shuttle`.
 2. The labels used in this model contains background, download link of labels file: https://github.com/leferrad/tensorflow-mobilenet/blob/master/imagenet/labels.txt
 3. Different platforms, different versions of tools and drivers may have slightly different results.

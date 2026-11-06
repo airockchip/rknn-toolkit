@@ -4,21 +4,25 @@ import numpy as np
 import cv2
 from rknn.api import RKNN
 
-def show_outputs(outputs):
-    output = outputs[0][0]
-    output_sorted = sorted(output, reverse=True)
-    top5_str = 'inception_v1\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
+CLASS_LABEL_PATH = './labels.txt'
+
+
+def show_top5(outputs):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
+
+    output = outputs[0].reshape(-1)
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: inception_v1_224_quant\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(
+                index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
     print(top5_str)
 
 
@@ -85,6 +89,8 @@ if __name__ == '__main__':
     # Set inputs
     img = cv2.imread('./dog_224x224.jpg')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # HWC -> NHWC
+    img = np.expand_dims(img, 0)
 
     # Init runtime environment
     print('--> Init runtime environment')
@@ -102,7 +108,7 @@ if __name__ == '__main__':
     # Inference
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
-    show_outputs(outputs)
+    show_top5(outputs)
     print('done')
 
     rknn.release()

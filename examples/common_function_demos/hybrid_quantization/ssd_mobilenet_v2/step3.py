@@ -1,4 +1,3 @@
-import platform
 import sys
 import numpy as np
 import cv2
@@ -69,7 +68,7 @@ def IntersectBBox(box1, box2):
         return ovr
 
 
-def ssd_post_process(conf_data, loc_data, imgpath, output_dir='.'):
+def ssd_post_process(loc_data, conf_data, imgpath, output_dir='.'):
     prior_num = int(len(loc_data) / 4)  # num prior boxes
 
     prior_bboxes = np.array(box_priors_)

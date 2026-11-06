@@ -50,23 +50,25 @@ This example will print the TOP5 labels and corresponding scores of the test ima
 
 ```
 rk_result:
+model: mobilenet_v2_quant
 -----TOP 5-----
-[155]: 0.6007367372512817
-[154]: 0.17650733888149261
-[204]: 0.08209411054849625
-[283]: 0.028111280873417854
-[187]: 0.009626070968806744
+[155]: score=0.600737 class="n02086240 Shih-Tzu"
+[154]: score=0.176507 class="n02086079 Pekinese, Pekingese, Peke"
+[204]: score=0.082094 class="n02098413 Lhasa, Lhasa apso"
+[283]: score=0.028111 class="n02123394 Persian cat"
+[187]: score=0.009626 class="n02094433 Yorkshire terrier"
 
 pt_result:
+model: mobilenet_v2_quant
 -----TOP 5-----
-[155]: 0.5076675415039062
-[154]: 0.32070720195770264
-[204]: 0.03760503977537155
-[283]: 0.027686361223459244
-[284]: 0.015007374808192253
+[155]: score=0.507668 class="n02086240 Shih-Tzu"
+[154]: score=0.320707 class="n02086079 Pekinese, Pekingese, Peke"
+[204]: score=0.037605 class="n02098413 Lhasa, Lhasa apso"
+[283]: score=0.027686 class="n02123394 Persian cat"
+[284]: score=0.015007 class="n02123597 Siamese cat, Siamese"
 ```
 
-1. The label index with the highest score is 155, the corresponding label is `Pekinese, Pekingese, Peke`.
+1. The label index with the highest score is 155, the corresponding label is `Shih-Tzu`.
 2. It's obvious that RKNN and Pytorch inference results are not close. We had test this RKNN model and got 70.0 acc@1(on ImagedNet-1K), which is close to 71.6 refer to torchvision document. 
 3. Different platforms, different versions of tools and drivers may have slightly different results.
 
@@ -86,6 +88,3 @@ pt_result:
    ```
    list(torch.jit.load('QAT_model_path.pt').graph.nodes())
    ```
-
-   
-

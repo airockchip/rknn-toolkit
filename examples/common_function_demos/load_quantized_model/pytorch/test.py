@@ -6,6 +6,8 @@ import numpy as np
 from rknn.api import RKNN
 import torchvision
 
+CLASS_LABEL_PATH = './synset.txt'
+
 mean = [0.485, 0.456, 0.406]
 std=[0.229, 0.224, 0.225]
 
@@ -14,20 +16,23 @@ std = [s*255 for s in std]
 
 model_path = './quantized_mobilenet.pt'
 
-def show_outputs(output):
-    output_sorted = sorted(output, reverse=True)
-    top5_str = '\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
+
+def show_top5(outputs):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
+
+    output = outputs[0].reshape(-1)
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: mobilenet_v2_quant\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(
+                index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
     print(top5_str)
 
 def show_perfs(perfs):
@@ -83,7 +88,7 @@ def main():
             sys.argv[0]))
         exit(-1)
 
-    rknn = RKNN(verbose=False, verbose_file='./verbose_log.txt')
+    rknn = RKNN(verbose=False)
 
     # pre-process config
     print('--> Set config model')
@@ -141,12 +146,18 @@ def main():
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
     for i in range(3):
         img[:,:,i] = (img[:,:,i] - mean[i])/std[i]
+    # HWC -> NHWC
+    img = np.expand_dims(img, 0)
     
     # Inference
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
     print('rk_result:')
-    show_outputs(softmax(np.array(outputs[0][0])))
+    # do softmax
+    x = outputs[-1]
+    output = np.exp(x)/np.sum(np.exp(x))
+    outputs = [output]
+    show_top5(outputs)
     #! NOTE:
     # rknn_model got 70.0 accuracy on imagenet_1000
     # pt_i8 got 61.5 accuracy on imagenet_1000
@@ -163,10 +174,13 @@ def main():
     input = torch.from_numpy(img).reshape(1,*img.shape)
     input = input.permute(0,3,1,2)
 
-    pt_result = pt_model(input)
-    pt_result = torch.dequantize(pt_result)
+    pt_results = pt_model(input)
+    pt_results = torch.dequantize(pt_results)
     print('pt_result:')
-    show_outputs(softmax(pt_result[0].numpy()))
+    x = pt_results[0].cpu().detach().numpy().reshape(-1)
+    output = np.exp(x)/np.sum(np.exp(x))
+    outputs = [output]
+    show_top5(outputs)
 
 
 if __name__ == '__main__':

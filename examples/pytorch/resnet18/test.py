@@ -6,29 +6,30 @@ from rknn.api import RKNN
 import torchvision.models as models
 import torch
 
+CLASS_LABEL_PATH='./synset.txt'
+
+def show_top5(outputs):
+    with open(CLASS_LABEL_PATH, 'r') as f:
+        labels = [l.rstrip() for l in f]
+
+    output = outputs[0].reshape(-1)
+    # Get the indices of the top 5 largest values
+    output_sorted_indices = np.argsort(output)[::-1][:5]
+    top5_str = 'model: resnet18\n-----TOP 5-----\n'
+    for i, index in enumerate(output_sorted_indices):
+        value = output[index]
+        if value > 0:
+            topi = '[{:03d}]: score={:.6f} class="{}"\n'.format(index, value, labels[index])
+        else:
+            topi = '[ -1]: score=0.0\n'
+        top5_str += topi
+    print(top5_str)
 
 def export_pytorch_model():
     net = models.resnet18(pretrained=True)
     net.eval()
     trace_model = torch.jit.trace(net, torch.Tensor(1,3,224,224))
     trace_model.save('./resnet18.pt')
-
-
-def show_outputs(output):
-    output_sorted = sorted(output, reverse=True)
-    top5_str = '\n-----TOP 5-----\n'
-    for i in range(5):
-        value = output_sorted[i]
-        index = np.where(output == value)
-        for j in range(len(index)):
-            if (i + j) >= 5:
-                break
-            if value > 0:
-                topi = '{}: {}\n'.format(index[j], value)
-            else:
-                topi = '-1: 0.0\n'
-            top5_str += topi
-    print(top5_str)
 
 
 def show_perfs(perfs):
@@ -126,8 +127,12 @@ if __name__ == '__main__':
     # Inference
     print('--> Running model')
     outputs = rknn.inference(inputs=[img])
+    # Softmax
+    x = outputs[0]
+    output = np.exp(x)/np.sum(np.exp(x))
+    outputs = [output]
     # Show the top5 predictions
-    show_outputs(softmax(np.array(outputs[0][0])))
+    show_top5(outputs)
     print('done')
 
     rknn.release()

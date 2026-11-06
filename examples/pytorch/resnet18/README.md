@@ -34,11 +34,13 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[812]: 0.9993903636932373
-[404]: 0.0004593881603796035
-[657 833]: 2.9284470656421036e-05
-[657 833]: 2.9284470656421036e-05
-[895]: 1.8508895664126612e-05
+model: resnet18
+-----TOP 5-----
+[812]: score=0.999390 class="n04266014 space shuttle"
+[404]: score=0.000459 class="n02690373 airliner"
+[833]: score=0.000029 class="n04347754 submarine, pigboat, sub, U-boat"
+[657]: score=0.000029 class="n03773504 missile"
+[895]: score=0.000019 class="n04552348 warplane, military plane"
 ```
 
 1. The label index with the highest score is 812, the corresponding label is `space shuttle`.

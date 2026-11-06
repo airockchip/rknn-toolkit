@@ -34,14 +34,16 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
-[1]: 0.73388671875
-[115 996]: 0.033447265625
-[115 996]: 0.033447265625
-[927]: 0.026214599609375
-[794]: 0.024169921875
+model: mobilenet_v2
+-----TOP 5-----
+[001]: score=0.733887 class="n01443537 goldfish, Carassius auratus"
+[996]: score=0.033447 class="n13052670 hen-of-the-woods, hen of the woods, Polyporus frondosus, Grifola frondosa"
+[115]: score=0.033447 class="n01950731 sea slug, nudibranch"
+[927]: score=0.026215 class="n07613480 trifle"
+[794]: score=0.024170 class="n04209239 shower curtain"
 ```
 
-1. The label index with the highest score is 1, the corresponding label is `goldfish`.
+1. The label index with the highest score is 1, the corresponding label is `n01443537 goldfish, Carassius auratus`.
 2. The download link for labels file: https://github.com/HoldenCaulfieldRye/caffe/blob/master/data/ilsvrc12/synset_words.txt.
 3. Different platforms, different versions of tools and drivers may have slightly different results.
 

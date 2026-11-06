@@ -35,13 +35,14 @@ python test.py rv1126 c3d9b8674f4b94f6
 
 This example will print the TOP5 labels and corresponding scores of the test image classification results. For example, the inference results of this example are as follows:
 ```
+model: inception_v1_224_quant
 -----TOP 5-----
-[156]: 0.84765625
-[155 205]: 0.0625
-[155 205]: 0.0625
-[154 284]: 0.00390625
-[154 284]: 0.00390625
+[156]: score=0.847656 class="Shih-Tzu"
+[205]: score=0.062500 class="Lhasa, Lhasa apso"
+[155]: score=0.062500 class="Pekinese, Pekingese, Peke"
+[154]: score=0.003906 class="Maltese dog, Maltese terrier, Maltese"
+[284]: score=0.003906 class="Persian cat"
 ```
-1. The label index with the highest score is 156, the corresponding label is `Pekinese, Pekingese, Peke`.
+1. The label index with the highest score is 156, the corresponding label is `Shih-Tzu`.
 2. The labels used in this model contains background, download link of labels file: https://github.com/leferrad/tensorflow-mobilenet/blob/master/imagenet/labels.txt
 4. Different platforms, different versions of tools and drivers may have slightly different results.

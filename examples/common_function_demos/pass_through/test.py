@@ -16,6 +16,15 @@ from rknn.api import RKNN
 # Needed to show segmentation colormap labels
 import get_dataset_colormap
 
+_HELP_TEXT = """
+Usage Examples:
+python test.py
+python test.py --not-pass-through
+python test.py --use-rknn
+python test.py --target rk1808
+python test.py --target rv1126 --device-id c3d9b8674f4b94f6
+"""
+
 INPUT_SIZE = 513
 TEST_IMAGE = './bike_boy.jpg'
 LABEL_NAMES = np.asarray([
@@ -108,50 +117,42 @@ def vis_segmentation(image, seg_map):
     plt.xticks([], [])
     ax.tick_params(width=0)
 
-    plt.show()
+    # plt.show()
+    plt.savefig('seg_results.jpg')
 
 def deeplabv3_post_process(img, inference_result):
     origin_im = Image.open(img)
-    print('running deeplab on image %s...' % img)
+    print('--> Post process with image %s...' % img)
     resized_im, seg_map = run(origin_im, inference_result)
 
     vis_segmentation(resized_im, seg_map)
+    print('done')
+
+def get_args():
+    """
+    parse commandline
+    """
+    parser = argparse.ArgumentParser(description="RKNN Toolkit pass_through demo.",
+                                     formatter_class=argparse.RawDescriptionHelpFormatter, epilog=_HELP_TEXT)
+    parser.add_argument("--not-pass-through", action="store_true", default=False, help="Do not pass through input data.")
+    parser.add_argument("--use-rknn", action="store_true", default=False, help="Use RKNN model directly.")
+    parser.add_argument("--target", default='rv1126', help = "Target device, default is 'rv1126', other target device can be: 'rk1806', 'rk1808', 'rk3399pro', 'rv1109', 'rv1126'")
+    parser.add_argument("--device-id", default=None,
+                        help="Device id of target device, if multiple devices connected, '--target' and this parameter must be set.")
+
+    args = parser.parse_args()
+
+    return args
+
 
 if __name__ == '__main__':
-    if len(sys.argv) not in [1, 2, 3, 4, 5]:
-        print('Usage: python {} [pass_through] [use_rknn] [target] [device_id]'.format(
-            sys.argv[0]))
-        print('     pass_through: 0 or 1, 0 means runtime need do preprocess, otherwise pass thourgh input data to RKNN model.')
-        print('     use_rknn: 0 or 1. If set to 0, need to do model conversion; otherwise, using RKNN model directly.')
-        print('Such as: python {} 1 0 rv1126 c3d9b8674f4b94f6'.format(
-            sys.argv[0]))
-        exit(-1)
 
-    pass_through = True
-    use_rknn = False
+    args = get_args()
 
-    # default target and device_id
-    target = 'rv1126'
-    device_id = None
-
-    if len(sys.argv) == 1:
-        print('Use default target: {}. Need to do model conversion. Pass through input data to RKNN model.')
-    elif len(sys.argv) == 2:
-        pass_through = True if sys.argv[1] == '1' else False
-        print('Use default target: {}. Need to do model conversion. Pass through input data to RKNN model.')
-    elif len(sys.argv) == 3:
-        pass_through = True if sys.argv[1] == '1' else False
-        use_rknn = True if sys.argv[2] == '1' else False
-        print('Use default target: {}.'.format(target))
-    elif len(sys.argv) == 4:
-        pass_through = True if sys.argv[1] == '1' else False
-        use_rknn = True if sys.argv[2] == '1' else False
-        target = sys.argv[3]
-    elif len(sys.argv) == 5:
-        pass_through = True if sys.argv[1] == '1' else False
-        use_rknn = True if sys.argv[2] == '1' else False
-        target = sys.argv[3]
-        device_id = sys.argv[4]
+    not_pass_through = args.not_pass_through
+    use_rknn = args.use_rknn
+    target = args.target
+    device_id = args.device_id
 
     PB_MODEL = './deeplab-v3-plus-mobilenet-v2.pb'
     RKNN_MODEL = './deeplab-v3-plus-mobilenet-v2.rknn'
@@ -172,7 +173,8 @@ if __name__ == '__main__':
         print('done')
 
     if not use_rknn:
-        # set config refer to pass_througn value.
+        print('--> Convert {} to {}'.format(PB_MODEL, RKNN_MODEL))
+        # Set config refer to pass_througn value.
         rknn.config(mean_values=[[127.5, 127.5, 127.5]],
                     std_values=[[127.5, 127.5, 127.5]],
                     reorder_channel='0 1 2',
@@ -185,7 +187,7 @@ if __name__ == '__main__':
                                    outputs=['ResizeBilinear_2'],
                                    input_size_list=[[513, 513, 3]])
         if ret != 0:
-            print('load_tensorflow failed')
+            print('Load {} failed'.format(PB_MODEL))
             rknn.release()
             exit(ret)
         print('done')
@@ -194,7 +196,7 @@ if __name__ == '__main__':
         print('--> Building model')
         ret = rknn.build(do_quantization=True, dataset='./dataset.txt', pre_compile=False)
         if ret != 0:
-            print('build rknn model failed')
+            print('Build rknn model failed')
             rknn.release()
             exit(ret)
         print('done')
@@ -203,20 +205,20 @@ if __name__ == '__main__':
         print('--> Export RKNN model')
         ret = rknn.export_rknn(RKNN_MODEL)
         if ret != 0:
-            print('export rknn model failed')
+            print('Export rknn model failed')
             rknn.release()
             exit(ret)
         print('done')
     else:
-        print('--> Load model')
+        print('--> Load RKNN model')
         ret = rknn.load_rknn(RKNN_MODEL)
         if ret < 0:
-            print('load model failed.')
+            print('Load RKNN model failed.')
             rknn.release()
             exit(ret)
         print('done')
 
-    # init runtime 
+    # Init RKNN runtime
     print('--> init runtime')
     if target.lower() == 'rk3399pro' and platform.machine() == 'aarch64':
         print('Run demo on RK3399Pro, using default NPU.')
@@ -224,15 +226,22 @@ if __name__ == '__main__':
         device_id = None
     ret = rknn.init_runtime(target=target, device_id=device_id)
     if ret < 0:
-        print('init runtime failed')
+        print('Init runtime failed')
         rknn.release()
         exit(ret)
     print('done')
 
+    # Inference
+    print('--> inference')
+
+    # Get input data
     img = cv2.imread(TEST_IMAGE)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # preprocess if pass_through is True
-    if pass_through == True:
+    if not_pass_through:
+        print('Pass normal data to runtime, runtime will do preprocess and quantize.')
+        inputs_pass_through = [0]
+    else:
         print('Pass through input data to model directly.')
         img = (img.astype(np.float32)-127.5)/127.5
         # quantize input
@@ -240,18 +249,13 @@ if __name__ == '__main__':
         zp = 127
         img = ((img / scale) + zp).astype(np.uint8)
         inputs_pass_through=[1]
-    else:
-        print('Pass normal data to runtime, runtime will do preprocess and quantize.')
-        inputs_pass_through=[0]
 
-    # inference
-    print('--> inference')
     outputs = rknn.inference(inputs=[img], inputs_pass_through=inputs_pass_through)
     for idx, out in enumerate(outputs):
-        if pass_through:
-            np.save('out{}_pass.npy'.format(idx), out)
-        else:
+        if not_pass_through:
             np.save('out{}_norm.npy'.format(idx), out)
+        else:
+            np.save('out{}_pass.npy'.format(idx), out)
     print('done')
 
     rknn.release()
